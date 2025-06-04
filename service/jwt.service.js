@@ -27,7 +27,7 @@ class JwtService {
         return jwt.verify(token, this.accessKey)
     }
 
-    async refreshToken(token){
+    async verifyRefreshToken(token){
         return jwt.verify(token, this.refreshKey)
     }
 

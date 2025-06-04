@@ -1,7 +1,9 @@
 const { sendErrorResponse } = require("../helpers/send_error_res");
 const User = require("../models/users.model");
+const config = require('config')
 const bcrypt = require("bcrypt");
 const { JwtServicee } = require("../service/jwt.service");
+const Role = require("../models/role.model");
 
 const login = async (req, res) => {
   try {
@@ -42,13 +44,13 @@ const login = async (req, res) => {
     user.hashed_token = hashed_token;
     await user.save();
 
-    res.cookies("refreshToken", tokens.refreshToken, {
+    res.cookie("refreshToken", tokens.refreshToken, {
       maxAge: config.get("cookie_refresh_time"),
       httpOnly: true,
     });
     res
       .status(200)
-      .send({ message: "User logged in", accessRoken: tokens.accessToken });
+      .send({ message: "User logged in", accessToken: tokens.accessToken });
   } catch (error) {
     sendErrorResponse(error, res, 400);
   }
@@ -118,7 +120,7 @@ const refresh = async (req, res) => {
       roles: user.roles,
     };
 
-    const tokens = JwtServicee.generateTokens(payload);
+    const tokens = JwtServicee.generateToken(payload);
 
     const hashed_token = await bcrypt.hash(tokens.accessToken, 7);
     user.hashed_token = hashed_token;
